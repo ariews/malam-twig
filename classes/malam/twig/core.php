@@ -8,32 +8,36 @@ defined('SYSPATH') or die('No direct script access.');
 
 class Malam_Twig_Core
 {
+    const THEME = 'default';
+
     /**
      * @var Twig
      */
     public $twig;
 
-    public static function instance()
+    public static function instance($theme = Malam_Twig::THEME)
     {
         static $instance;
-        empty($instance) && $instance = new Malam_Twig();
+        empty($instance) && $instance = new Malam_Twig($theme);
         return $instance;
     }
 
-    public function __construct()
+    public static function factory($theme = Malam_Twig::THEME)
     {
-        $config = Kohana::$config->load('twig');
+        return new Malam_Twig($theme);
+    }
 
-        $default_theme  = 'default';
-        $theme_name     = $config->theme_name;
+    public function __construct($theme = Malam_Twig::THEME)
+    {
+        $this->set_theme($theme);
+    }
 
-        /**
-         * Add default_theme path to loader
-         */
-        $loader = new Twig_Loader_Filesystem($config->templates.'/themes/'.$theme_name);
-        $loader->addPath($config->templates.'/themes/'.$default_theme);
-
-        $twig   = new Twig_Environment($loader, $config->environment);
+    public function set_theme($theme = Malam_Twig::THEME)
+    {
+        $config     = Kohana::$config->load('twig');
+        $theme_dir  = "{$config->templates}themes/{$theme}";
+        $loader     = new Twig_Loader_Filesystem($theme_dir);
+        $twig       = new Twig_Environment($loader, $config->environment);
 
         $twig->addFunction('K', new Twig_Function_Function('Malam_Twig::staticCall', array(
             'is_safe' => array('html')
@@ -47,7 +51,9 @@ class Malam_Twig_Core
             }
         }
 
-        $this->twig = $twig;
+        Malam_Meta::$theme = $theme;
+
+        return $this->twig = $twig;
     }
 
     public function Twig()

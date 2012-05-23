@@ -8,6 +8,8 @@ defined('SYSPATH') or die('No direct script access.');
 
 abstract class Malam_Twig_Meta
 {
+    public static $theme = Malam_Twig::THEME;
+
     private static $_available_methods = array(
         'image',
         'script',
@@ -29,29 +31,26 @@ abstract class Malam_Twig_Meta
         $backend = FALSE;
         $link_only = FALSE;
 
-        $arguments += array(NULL, NULL, FALSE, FALSE);
+        $arguments += array(NULL, NULL, FALSE);
 
-        list($filenames, $attributes, $backend, $link_only) = $arguments;
-        
+        list($filenames, $attributes, $link_only) = $arguments;
+
         if (NULL === $filenames || empty($filenames))
             return;
 
         if (is_string($attributes))
             $attributes = array($attributes);
 
-        if (TRUE === $backend)
-            $folder = "$folder/backend";
-
         if ($name == 'flash' || TRUE === (bool) $link_only)
         {
             if (is_array($filenames))
                 return;
 
-            return __($pattern, array(
-                ':theme_name'   => $config->theme_name,
+            return URL::site(__($pattern, array(
+                ':theme_name'   => Malam_Meta::$theme,
                 ':folder'       => $folder,
                 ':filename'     => $filenames
-            ));
+            )));
         }
 
         else
@@ -67,11 +66,11 @@ abstract class Malam_Twig_Meta
             foreach ($filenames as $filename)
             {
                 $filepath = Valid::url($filename) ? $filename : __($pattern, array(
-                    ':theme_name'   => $config->theme_name,
+                    ':theme_name'   => Malam_Meta::$theme,
                     ':folder'       => $folder,
                     ':filename'     => $filename
                 ));
-                
+
                 $string .= HTML::$name($filepath, $attributes);
             }
 

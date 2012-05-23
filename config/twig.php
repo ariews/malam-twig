@@ -7,7 +7,6 @@ defined('SYSPATH') or die('No direct script access.');
  */
 
 return array(
-    'theme_name'    => 'default',
     'extensions'    => array(),
     'templates'     => APPPATH.'views',
     'suffix'        => 'html',

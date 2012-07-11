@@ -25,7 +25,7 @@ class Malam_Twig_Meta
 
         if (TRUE === $link_only && ! is_array($filenames))
         {
-            return $this->_create_path($folder, $filenames);
+            return URL::site($this->_create_path($folder, $filenames));
         }
         else
         {
@@ -50,6 +50,13 @@ class Malam_Twig_Meta
 
             return $string;
         }
+    }
+    
+    public function favicon($icon = 'favicon.ico')
+    {
+        return "<link rel='shortcut icon' href='".
+                URL::site($this->__compile('image', $icon, NULL, TRUE))
+                ."' type='image/x-icon' />";
     }
 
     private function _path_stripper($path)

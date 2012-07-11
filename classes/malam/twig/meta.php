@@ -6,7 +6,7 @@ defined('SYSPATH') or die('No direct script access.');
  * @author  arie
  */
 
-abstract class Malam_Twig_Meta
+class Malam_Twig_Meta
 {
     const PATTERN = 'themes/:theme_name/media/:folder/:filename';
 

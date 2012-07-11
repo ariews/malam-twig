@@ -13,14 +13,7 @@ class Malam_Twig_Core
     /**
      * @var Twig
      */
-    public $twig;
-
-    public static function instance($theme = Malam_Twig::THEME)
-    {
-        static $instance;
-        empty($instance) && $instance = new Malam_Twig($theme);
-        return $instance;
-    }
+    private $_twig;
 
     public static function factory($theme = Malam_Twig::THEME)
     {
@@ -51,14 +44,12 @@ class Malam_Twig_Core
             }
         }
 
-        Malam_Meta::$theme = $theme;
-
-        return $this->twig = $twig;
+        return $this->_twig = $twig;
     }
 
     public function Twig()
     {
-        return $this->twig;
+        return $this->_twig;
     }
 
     public static function staticCall($function, $args = array())

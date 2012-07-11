@@ -8,51 +8,25 @@ defined('SYSPATH') or die('No direct script access.');
 
 abstract class Malam_Twig_Meta
 {
-    public static $theme = Malam_Twig::THEME;
+    const PATTERN = 'themes/:theme_name/media/:folder/:filename';
 
     private static $_available_methods = array(
         'image',
         'script',
         'style',
-        'flash'
     );
 
-    public static function __callStatic($name, $arguments)
+    private $_theme;
+
+    private function __compile($folder, $filenames, array $attributes = NULL, $link_only = FALSE)
     {
-        $name   = strtolower($name);
-        $folder = $name;
-
-        if (! in_array($name, self::$_available_methods))
+        if (NULL === $filenames)
             return;
 
-        $pattern = 'themes/:theme_name/media/:folder/:filename';
-        $config  = Kohana::$config->load('twig');
-        $name    = strtolower($name);
-        $backend = FALSE;
-        $link_only = FALSE;
-
-        $arguments += array(NULL, NULL, FALSE);
-
-        list($filenames, $attributes, $link_only) = $arguments;
-
-        if (NULL === $filenames || empty($filenames))
-            return;
-
-        if (is_string($attributes))
-            $attributes = array($attributes);
-
-        if ($name == 'flash' || TRUE === (bool) $link_only)
+        if (TRUE === $link_only && ! is_array($filenames))
         {
-            if (is_array($filenames))
-                return;
-
-            return URL::site(__($pattern, array(
-                ':theme_name'   => Malam_Meta::$theme,
-                ':folder'       => $folder,
-                ':filename'     => $filenames
-            )));
+            return $this->_create_path($folder, $filenames);
         }
-
         else
         {
             if (! is_array($filenames))
@@ -60,21 +34,68 @@ abstract class Malam_Twig_Meta
 
             $string = '';
 
-            if (! is_array($attributes))
+            if (NULL !== $attributes && ! is_array($attributes))
+            {
                 $attributes = array($attributes);
+            }
 
             foreach ($filenames as $filename)
             {
-                $filepath = Valid::url($filename) ? $filename : __($pattern, array(
-                    ':theme_name'   => Malam_Meta::$theme,
-                    ':folder'       => $folder,
-                    ':filename'     => $filename
-                ));
+                $filename = Valid::url($filename)
+                        ? $filename
+                        : $this->_create_path($folder, $filename);
 
-                $string .= HTML::$name($filepath, $attributes);
+                $string .= HTML::$folder($filename, $attributes);
             }
 
             return $string;
         }
+    }
+
+    private function _path_stripper($path)
+    {
+        return ltrim(preg_replace('#[./]{2,}#i', '/', $path), '/');
+    }
+
+    private function _create_path($folder, $filename)
+    {
+        return __(Meta::PATTERN, array(
+            ':theme_name'       => $this->_theme,
+            ':folder'           => $this->_path_stripper($folder),
+            ':filename'         => $this->_path_stripper($filename),
+        ));
+    }
+
+    private function __construct($theme = Malam_Twig::THEME)
+    {
+        $this->_theme = $theme;
+    }
+
+    public static function instance($theme = Malam_Twig::THEME)
+    {
+        static $instance;
+        empty($instance) && $instance = new self($theme);
+        return $instance;
+    }
+
+    public static function __callStatic($name, $arguments)
+    {
+        $arguments += array(NULL, NULL, FALSE);
+        list($filenames, $attributes, $link_only) = $arguments;
+
+        return Meta::instance()->$name($filenames, $attributes, $link_only);
+    }
+
+    public function __call($name, $arguments)
+    {
+        $name = strtolower($name);
+
+        $arguments += array(NULL, NULL, FALSE);
+        list($filenames, $attributes, $link_only) = $arguments;
+
+        if (! in_array($name, self::$_available_methods) || NULL === $filenames || empty($filenames))
+            return;
+
+        return $this->__compile($name, $filenames, $attributes, $link_only);
     }
 }

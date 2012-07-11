@@ -55,7 +55,7 @@ class Malam_Twig_Meta
     public function favicon($icon = 'favicon.ico')
     {
         return "<link rel='shortcut icon' href='".
-                URL::site($this->__compile('image', $icon, NULL, TRUE))
+                $this->__compile('image', $icon, NULL, TRUE)
                 ."' type='image/x-icon' />";
     }
 

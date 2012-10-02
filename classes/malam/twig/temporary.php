@@ -31,6 +31,24 @@ class Malam_Twig_Temporary
         }
     }
 
+    public function delete($key)
+    {
+        if (isset($this->$key))
+        {
+            unset($this->temporary[$key]);
+        }
+    }
+
+    public function __isset($key)
+    {
+        return isset($this->temporary[$key]);
+    }
+
+    public function __unset($key)
+    {
+        $this->delete($key);
+    }
+
     public function as_array()
     {
         return $this->temporary;

@@ -51,12 +51,22 @@ class Malam_Twig_Meta
             return $string;
         }
     }
-    
+
     public function favicon($icon = 'favicon.ico')
     {
-        return "<link rel='shortcut icon' href='".
-                $this->__compile('image', $icon, NULL, TRUE)
-                ."' type='image/x-icon' />";
+        $attributes = array('rel' => 'shortcut icon', 'type' => 'image/x-icon');
+        return $this->header_link($icon, $attributes);
+    }
+
+    public function header_link($href, array $attributes = NULL, $type = 'image')
+    {
+        if (! in_array($type, self::$_available_methods))
+            $type = 'image';
+
+        $href = $this->__compile($type, $href, NULL, TRUE);
+        $attributes += array('href' => $href);
+
+        return '<link'.HTML::attributes($attributes).'/>';
     }
 
     private function _path_stripper($path)

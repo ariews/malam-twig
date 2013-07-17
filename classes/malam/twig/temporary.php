@@ -17,13 +17,15 @@ class Malam_Twig_Temporary
 
     public function __get($name)
     {
-        return (isset($this->temporary[$name]) ? $this->temporary[$name] : NULL);
+        return Arr::get($this->temporary, $name);
     }
 
     public function set($name, $value = NULL)
     {
         if (! is_array($name))
+        {
             $name = array($name  => $value);
+        }
 
         foreach ($name as $k => $v)
         {

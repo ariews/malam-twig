@@ -12,12 +12,17 @@ class Malam_Twig_Temporary
 
     public function __set($name, $value)
     {
-        $this->temporary[$name] = $value;
+        $this->set($name, $value);
     }
 
     public function __get($name)
     {
-        return Arr::get($this->temporary, $name);
+        return $this->get($name);
+    }
+
+    public function get($name, $default = NULL)
+    {
+        return Arr::get($this->temporary, $name, $default = NULL);
     }
 
     public function set($name, $value = NULL)
@@ -29,7 +34,7 @@ class Malam_Twig_Temporary
 
         foreach ($name as $k => $v)
         {
-            $this->__set($k, $v);
+            $this->temporary[$k] = $v;
         }
     }
 

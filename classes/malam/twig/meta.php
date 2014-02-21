@@ -10,15 +10,15 @@ class Malam_Twig_Meta
 {
     const PATTERN = 'themes/:theme_name/media/:folder/:filename';
 
-    private static $_available_methods = array(
+    protected static $_available_methods = array(
         'image',
         'script',
         'style',
     );
 
-    private $_theme;
+    protected $_theme;
 
-    private function __compile($folder, $filenames, array $attributes = NULL, $link_only = FALSE)
+    protected function _compile($folder, $filenames, array $attributes = NULL, $link_only = FALSE)
     {
         if (NULL === $filenames)
             return;
@@ -63,18 +63,18 @@ class Malam_Twig_Meta
         if (! in_array($type, self::$_available_methods))
             $type = 'image';
 
-        $href = $this->__compile($type, $href, NULL, TRUE);
+        $href = $this->_compile($type, $href, NULL, TRUE);
         $attributes += array('href' => $href);
 
         return '<link'.HTML::attributes($attributes).'/>';
     }
 
-    private function _path_stripper($path)
+    protected function _path_stripper($path)
     {
         return ltrim(preg_replace('#[./]{2,}#i', '/', $path), '/');
     }
 
-    private function _create_path($folder, $filename)
+    protected function _create_path($folder, $filename)
     {
         return __(Meta::PATTERN, array(
             ':theme_name'       => $this->_theme,
@@ -83,7 +83,7 @@ class Malam_Twig_Meta
         ));
     }
 
-    private function __construct($theme = Malam_Twig::THEME)
+    protected function __construct($theme = Malam_Twig::THEME)
     {
         $this->_theme = $theme;
     }
@@ -91,7 +91,7 @@ class Malam_Twig_Meta
     public static function instance($theme = Malam_Twig::THEME)
     {
         static $instance;
-        empty($instance) && $instance = new self($theme);
+        empty($instance) && $instance = new Meta($theme);
         return $instance;
     }
 
@@ -113,6 +113,6 @@ class Malam_Twig_Meta
         if (! in_array($name, self::$_available_methods) || NULL === $filenames || empty($filenames))
             return;
 
-        return $this->__compile($name, $filenames, $attributes, $link_only);
+        return $this->_compile($name, $filenames, $attributes, $link_only);
     }
 }
